@@ -2,31 +2,34 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Profile;
 
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
+use App\CQRS\Query\GetProfile\GetProfileHandler;
+use App\CQRS\Query\GetProfile\GetProfileQuery;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ProfileController extends AbstractController
+final class ShowController extends AbstractController
 {
+    public function __construct(
+        private GetProfileHandler $profileHandler,
+    ) {}
+
     #[Route('/profile', name: 'profile')]
-    public function profile(Request $request, EntityManagerInterface $em): Response
+    public function __invoke(Request $request): Response
     {
-        $session = $request->getSession();
-        $userId = $session->get('user_id');
+        $userId = $request->getSession()->get('user_id');
 
         if (!$userId) {
             return $this->redirectToRoute('home');
         }
 
-        $user = $em->getRepository(User::class)->find($userId);
+        $user = $this->profileHandler->handle(new GetProfileQuery($userId));
 
         if (!$user) {
-            $session->clear();
+            $request->getSession()->clear();
             return $this->redirectToRoute('home');
         }
 

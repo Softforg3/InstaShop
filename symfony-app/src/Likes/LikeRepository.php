@@ -11,80 +11,71 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final class LikeRepository extends ServiceEntityRepository implements LikeRepositoryInterface
 {
-    private ?User $user;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Like::class);
     }
 
-    public function setUser(?User $user): void
-    {
-        $this->user = $user;
-    }
-
     #[\Override]
-    public function unlikePhoto(Photo $photo): void
+    public function findLike(User $user, Photo $photo): ?Like
     {
-        $em = $this->getEntityManager();
-
-        $like = $em->createQueryBuilder()
-            ->select('l')
-            ->from(Like::class, 'l')
+        return $this->createQueryBuilder('l')
             ->where('l.user = :user')
             ->andWhere('l.photo = :photo')
-            ->setParameter('user', $this->user)
+            ->setParameter('user', $user)
             ->setParameter('photo', $photo)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
-
-        if ($like) {
-            $em->remove($like);
-            $em->flush();
-
-            $photo->setLikeCounter($photo->getLikeCounter() - 1);
-            $em->persist($photo);
-
-            $em->flush();
-        }
     }
 
     #[\Override]
-    public function hasUserLikedPhoto(Photo $photo): bool
+    public function hasUserLikedPhoto(User $user, Photo $photo): bool
     {
-        $likes = $this->createQueryBuilder('l')
-            ->select('l.id')
+        return (int) $this->createQueryBuilder('l')
+            ->select('COUNT(l.id)')
             ->where('l.user = :user')
             ->andWhere('l.photo = :photo')
-            ->setParameter('user', $this->user)
+            ->setParameter('user', $user)
             ->setParameter('photo', $photo)
             ->getQuery()
-            ->getArrayResult();
-
-        return count($likes) > 0;
+            ->getSingleScalarResult() > 0;
     }
 
     #[\Override]
-    public function createLike(Photo $photo): Like
+    public function addLike(User $user, Photo $photo): Like
     {
         $like = new Like();
-        $like->setUser($this->user);
+        $like->setUser($user);
         $like->setPhoto($photo);
 
-        $em = $this->getEntityManager();
-        $em->persist($like);
-        $em->flush();
+        $this->getEntityManager()->persist($like);
 
         return $like;
     }
 
     #[\Override]
-    public function updatePhotoCounter(Photo $photo, int $increment): void
+    public function removeLike(Like $like): void
     {
-        $em = $this->getEntityManager();
-        $photo->setLikeCounter($photo->getLikeCounter() + $increment);
-        $em->persist($photo);
-        $em->flush();
+        $this->getEntityManager()->remove($like);
+    }
+
+    #[\Override]
+    public function getLikedPhotoIds(User $user, array $photos): array
+    {
+        if (empty($photos)) {
+            return [];
+        }
+
+        $result = $this->createQueryBuilder('l')
+            ->select('IDENTITY(l.photo) as photo_id')
+            ->where('l.user = :user')
+            ->andWhere('l.photo IN (:photos)')
+            ->setParameter('user', $user)
+            ->setParameter('photos', $photos)
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_map('intval', array_column($result, 'photo_id'));
     }
 }
