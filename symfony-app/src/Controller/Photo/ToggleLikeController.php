@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller\Photo;
 
+use App\CQRS\CommandBus;
 use App\CQRS\Command\LikePhoto\LikePhotoCommand;
-use App\CQRS\Command\LikePhoto\LikePhotoHandler;
 use App\CQRS\Command\UnlikePhoto\UnlikePhotoCommand;
-use App\CQRS\Command\UnlikePhoto\UnlikePhotoHandler;
 use App\Entity\Photo;
 use App\Entity\User;
 use App\Likes\LikeRepositoryInterface;
@@ -20,10 +19,9 @@ use Symfony\Component\Routing\Annotation\Route;
 final class ToggleLikeController extends AbstractController
 {
     public function __construct(
-        private LikePhotoHandler $likeHandler,
-        private UnlikePhotoHandler $unlikeHandler,
-        private LikeRepositoryInterface $likeRepository,
-        private EntityManagerInterface $em,
+        private readonly CommandBus $commandBus,
+        private readonly LikeRepositoryInterface $likeRepository,
+        private readonly EntityManagerInterface $em,
     ) {}
 
     #[Route('/photo/{id}/like', name: 'photo_like')]
@@ -44,10 +42,10 @@ final class ToggleLikeController extends AbstractController
         }
 
         if ($this->likeRepository->hasUserLikedPhoto($user, $photo)) {
-            $this->unlikeHandler->handle(new UnlikePhotoCommand($userId, $id));
+            $this->commandBus->dispatch(new UnlikePhotoCommand($userId, $id));
             $this->addFlash('info', 'Photo unliked!');
         } else {
-            $this->likeHandler->handle(new LikePhotoCommand($userId, $id));
+            $this->commandBus->dispatch(new LikePhotoCommand($userId, $id));
             $this->addFlash('success', 'Photo liked!');
         }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Home;
 
-use App\CQRS\Query\GetGallery\GetGalleryHandler;
+use App\CQRS\QueryBus;
 use App\CQRS\Query\GetGallery\GetGalleryQuery;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class IndexController extends AbstractController
 {
     public function __construct(
-        private GetGalleryHandler $galleryHandler,
+        private readonly QueryBus $queryBus,
     ) {}
 
     #[Route('/', name: 'home')]
@@ -22,7 +22,7 @@ final class IndexController extends AbstractController
     {
         $userId = $request->getSession()->get('user_id');
 
-        $result = $this->galleryHandler->handle(new GetGalleryQuery($userId));
+        $result = $this->queryBus->dispatch(new GetGalleryQuery($userId));
 
         return $this->render('home/index.html.twig', $result);
     }

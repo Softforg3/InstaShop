@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Profile;
 
-use App\CQRS\Query\GetProfile\GetProfileHandler;
+use App\CQRS\QueryBus;
 use App\CQRS\Query\GetProfile\GetProfileQuery;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class ShowController extends AbstractController
 {
     public function __construct(
-        private GetProfileHandler $profileHandler,
+        private readonly QueryBus $queryBus,
     ) {}
 
     #[Route('/profile', name: 'profile')]
@@ -26,7 +26,7 @@ final class ShowController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        $user = $this->profileHandler->handle(new GetProfileQuery($userId));
+        $user = $this->queryBus->dispatch(new GetProfileQuery($userId));
 
         if (!$user) {
             $request->getSession()->clear();

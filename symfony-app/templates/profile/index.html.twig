@@ -101,7 +101,7 @@
             line-height: 1.6;
         }
         
-        .back-button {
+        .back-button, .import-button {
             display: inline-block;
             margin-top: 30px;
             padding: 12px 30px;
@@ -112,11 +112,67 @@
             font-weight: 600;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
         }
-        
-        .back-button:hover {
+
+        .back-button:hover, .import-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .phoenix-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #e67e22;
+        }
+
+        .phoenix-section-label {
+            font-size: 0.85em;
+            color: #e67e22;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        .token-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .token-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: border-color 0.2s;
+        }
+
+        .token-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .token-save-btn {
+            padding: 10px 20px;
+            background: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .token-save-btn:hover {
+            background: #d35400;
         }
         
         .profile-stats {
@@ -204,6 +260,21 @@
             </div>
         </div>
         
+        <div class="phoenix-section">
+            <div class="phoenix-section-label">Phoenix API Integration</div>
+            <form action="{{ path('profile_save_token') }}" method="post" class="token-form">
+                <input type="text" name="phoenix_token" class="token-input"
+                       placeholder="Enter your Phoenix API token"
+                       value="{{ user.phoenixApiToken ?? '' }}">
+                <button type="submit" class="token-save-btn">Save Token</button>
+            </form>
+            {% if user.phoenixApiToken %}
+                <form action="{{ path('profile_import_photos') }}" method="post" style="text-align: center;">
+                    <button type="submit" class="import-button">Import Photos from Phoenix</button>
+                </form>
+            {% endif %}
+        </div>
+
         <div style="text-align: center;">
             <a href="{{ path('home') }}" class="back-button">← Back to Gallery</a>
         </div>

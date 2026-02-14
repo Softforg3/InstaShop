@@ -7,9 +7,10 @@ namespace App\CQRS\Query\GetGallery;
 use App\Entity\User;
 use App\Likes\LikeRepositoryInterface;
 use App\Repository\PhotoRepository;
+use App\CQRS\QueryHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class GetGalleryHandler
+final class GetGalleryHandler implements QueryHandlerInterface
 {
     public function __construct(
         private readonly PhotoRepository $photoRepository,

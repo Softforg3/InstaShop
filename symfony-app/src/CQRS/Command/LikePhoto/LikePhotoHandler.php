@@ -10,9 +10,10 @@ use App\Domain\Exception\UserNotFoundException;
 use App\Entity\Photo;
 use App\Entity\User;
 use App\Likes\LikeRepositoryInterface;
+use App\CQRS\CommandHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class LikePhotoHandler
+final class LikePhotoHandler implements CommandHandlerInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $em,

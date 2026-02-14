@@ -21,19 +21,20 @@
 ## Wprowadzone zmiany (Zadanie 1)
 
 - CQRS — Command/Handler (Login, LikePhoto, UnlikePhoto) + Query/Handler (GetGallery, GetProfile)
+- CommandBus i QueryBus z tagged services — kontrolery nie znają konkretnych handlerów
 - Single-action controllers z `__invoke()`
 - Domenowe wyjątki zamiast generycznych
 - Stateless LikeRepository z transakcjami
 - Fix SQL injection i walidacji auth
 
+## Wprowadzone zmiany (Zadanie 2)
+
+- Import zdjęć z Phoenix API przez PhoenixClient (Ports & Adapters)
+- PhoenixPhotoDto + PhoenixPhotoCollection jako typowana kolekcja DTO
+- Formularz tokena i przycisk importu na profilu
+- Deduplikacja — nie importuje zdjęć które już istnieją
+
 ## Plan dalszych prac
-
-### Zadanie 2 — Import zdjęć z Phoenix API
-
-- Użytkownik wpisuje token do Phoenix API w profilu, token zapisywany w bazie
-- Po kliknięciu "Importuj" aplikacja pobiera zdjęcia z Phoenixa i zapisuje jako zdjęcia użytkownika
-- Komunikacja przez interfejs (Ports & Adapters) — łatwe mockowanie w testach
-- Obsługa błędów: zły token, problemy z API
 
 ### Zadanie 3 — Filtrowanie galerii
 

@@ -8,9 +8,10 @@ use App\Domain\Exception\InvalidTokenException;
 use App\Domain\Exception\UserNotFoundException;
 use App\Entity\AuthToken;
 use App\Entity\User;
+use App\CQRS\CommandHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class LoginHandler
+final class LoginHandler implements CommandHandlerInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
