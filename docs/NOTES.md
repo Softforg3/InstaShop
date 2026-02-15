@@ -7,7 +7,7 @@
 3. **Kontrolery robiły za dużo** — jeden kontroler na wiele akcji, logika biznesowa pomieszana z HTTP. Rozbiłem na single-action controllers + CQRS (Command/Query handlers).
 4. **LikeRepository miał mutowalny stan** — `setUser()` trzymał użytkownika w polu klasy. Repo powinno być bezstanowe, user idzie jako parametr.
 5. **Brak transakcji** — like tworzył rekord i aktualizował licznik jako dwie osobne operacje. Owinąłem w `wrapInTransaction()`.
-6. **Brak UNIQUE na likes** — tabela pozwala na duplikaty (user_id, photo_id). Do dodania.
+6. **Brak UNIQUE na likes** — tabela pozwala na duplikaty (user_id, photo_id). Naprawione — dodana migracja z deduplikacją istniejących danych.
 7. **Auth nie sprawdzał powiązania token-user** — można było zalogować się na cudze konto. Naprawione.
 8. **Generyczne wyjątki** — `catch (\Throwable)` tracił oryginalny błąd. Zastąpiłem domenowymi wyjątkami.
 9. **Brak testów** w Symfony (Phoenix API ma 6 testów).
