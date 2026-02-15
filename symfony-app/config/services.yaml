@@ -13,6 +13,8 @@ services:
             tags: ['app.command_handler']
         App\CQRS\QueryHandlerInterface:
             tags: ['app.query_handler']
+        App\Gallery\Filter\PhotoFilterInterface:
+            tags: ['app.photo_filter']
 
     App\Infrastructure\Http\PhoenixClient:
         arguments:

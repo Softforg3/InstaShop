@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\CQRS;
 
+use ReflectionMethod;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final class CommandBus
@@ -15,7 +17,7 @@ final class CommandBus
         #[TaggedIterator('app.command_handler')] iterable $handlers,
     ) {
         foreach ($handlers as $handler) {
-            $reflection = new \ReflectionMethod($handler, 'handle');
+            $reflection = new ReflectionMethod($handler, 'handle');
             $paramType = $reflection->getParameters()[0]->getType()->getName();
             $this->handlers[$paramType] = $handler;
         }
@@ -29,7 +31,7 @@ final class CommandBus
         $commandClass = get_class($command);
 
         if (!isset($this->handlers[$commandClass])) {
-            throw new \RuntimeException(sprintf('No handler registered for %s', $commandClass));
+            throw new RuntimeException(sprintf('No handler registered for %s', $commandClass));
         }
 
         return $this->handlers[$commandClass]->handle($command);

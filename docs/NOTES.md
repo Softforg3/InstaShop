@@ -21,7 +21,7 @@
 ## Wprowadzone zmiany (Zadanie 1)
 
 - CQRS — Command/Handler (Login, LikePhoto, UnlikePhoto) + Query/Handler (GetGallery, GetProfile)
-- CommandBus i QueryBus z tagged services — kontrolery nie znają konkretnych handlerów
+- CommandBus i QueryBus z tagged services — kontrolery nie znają konkretnych handlerów. W większym projekcie busy przenieślibyśmy do Infrastructure (bo to techniczna warstwa dispatcha), ale tutaj trzymam je w CQRS razem z handlerami — mniej plików do przeskakiwania, łatwiej ogarnąć całość
 - Single-action controllers z `__invoke()`
 - Domenowe wyjątki zamiast generycznych
 - Stateless LikeRepository z transakcjami
@@ -34,12 +34,18 @@
 - Formularz tokena i przycisk importu na profilu
 - Deduplikacja — nie importuje zdjęć które już istnieją
 
+## Wprowadzone zmiany (Zadanie 3)
+
+- Filtrowanie galerii po: location, camera, description, username, zakres dat (taken_at)
+- Strategy Pattern z tagged services — każdy typ filtra to osobna klasa implementująca `PhotoFilterInterface`, zbierane automatycznie przez `PhotoFilterRegistry`
+- GalleryFilterDto jako Value Object z `fromRequest()` — czyste mapowanie HTTP → domena
+- Formularz GET z zachowywaniem wartości filtrów po odświeżeniu
+
+Filtry budują `FilterCriteriaCollection` (pole + operator + wartość) bez wiedzy o Doctrine. Dopiero repozytorium mapuje kryteria na QueryBuilder. Dzięki temu gdyby w przyszłości galeria przeszła np. na Elasticsearch, wystarczy napisać nowy adapter mapujący te same kryteria na zapytania ES — strategie filtrów zostają bez zmian.
+
+Strategia to tu lekki overkill — przy kilku prostych filtrach tekstowych wystarczyłoby parę `if`-ów w repozytorium. Ale chciałem pokazać pattern, który zaczyna się opłacać przy bardziej złożonych filtrach (full-text, geo, zakresy cenowe). Dodanie nowego filtra = nowa klasa, zero zmian w istniejącym kodzie.
+
 ## Plan dalszych prac
-
-### Zadanie 3 — Filtrowanie galerii
-
-- Dynamiczne filtrowanie po: location, camera, description, taken_at (zakres dat), username
-- Formularz GET nad galerią z zachowywaniem wartości filtrów
 
 ### Testy
 
