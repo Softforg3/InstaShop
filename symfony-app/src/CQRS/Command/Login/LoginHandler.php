@@ -17,6 +17,11 @@ final class LoginHandler implements CommandHandlerInterface
         private readonly EntityManagerInterface $em,
     ) {}
 
+    public static function getHandledCommand(): string
+    {
+        return LoginCommand::class;
+    }
+
     public function handle(LoginCommand $command): User
     {
         $authToken = $this->em->getRepository(AuthToken::class)->findOneBy([

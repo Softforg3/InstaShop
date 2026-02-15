@@ -20,6 +20,11 @@ final class UnlikePhotoHandler implements CommandHandlerInterface
         private readonly LikeRepositoryInterface $likeRepository,
     ) {}
 
+    public static function getHandledCommand(): string
+    {
+        return UnlikePhotoCommand::class;
+    }
+
     public function handle(UnlikePhotoCommand $command): void
     {
         $user = $this->em->getRepository(User::class)->find($command->userId);

@@ -21,6 +21,11 @@ final class ImportPhotosHandler implements CommandHandlerInterface
         private readonly PhotoRepository $photoRepository,
     ) {}
 
+    public static function getHandledCommand(): string
+    {
+        return ImportPhotosCommand::class;
+    }
+
     public function handle(ImportPhotosCommand $command): int
     {
         $user = $this->em->getRepository(User::class)->find($command->userId);

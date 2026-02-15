@@ -14,6 +14,11 @@ final class GetProfileHandler implements QueryHandlerInterface
         private readonly EntityManagerInterface $em,
     ) {}
 
+    public static function getHandledQuery(): string
+    {
+        return GetProfileQuery::class;
+    }
+
     public function handle(GetProfileQuery $query): ?User
     {
         return $this->em->getRepository(User::class)->find($query->userId);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\CQRS;
 
-use ReflectionMethod;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
@@ -17,9 +16,7 @@ final class QueryBus
         #[TaggedIterator('app.query_handler')] iterable $handlers,
     ) {
         foreach ($handlers as $handler) {
-            $reflection = new ReflectionMethod($handler, 'handle');
-            $paramType = $reflection->getParameters()[0]->getType()->getName();
-            $this->handlers[$paramType] = $handler;
+            $this->handlers[$handler::getHandledQuery()] = $handler;
         }
     }
 

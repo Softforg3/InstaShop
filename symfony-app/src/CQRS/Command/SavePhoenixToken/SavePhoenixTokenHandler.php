@@ -15,6 +15,11 @@ final class SavePhoenixTokenHandler implements CommandHandlerInterface
         private readonly EntityManagerInterface $em,
     ) {}
 
+    public static function getHandledCommand(): string
+    {
+        return SavePhoenixTokenCommand::class;
+    }
+
     public function handle(SavePhoenixTokenCommand $command): void
     {
         $user = $this->em->getRepository(User::class)->find($command->userId);

@@ -6,4 +6,5 @@ namespace App\CQRS;
 
 interface CommandHandlerInterface
 {
+    public static function getHandledCommand(): string;
 }

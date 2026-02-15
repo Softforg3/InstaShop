@@ -11,6 +11,9 @@
 7. **Auth nie sprawdzał powiązania token-user** — można było zalogować się na cudze konto. Naprawione.
 8. **Generyczne wyjątki** — `catch (\Throwable)` tracił oryginalny błąd. Zastąpiłem domenowymi wyjątkami.
 9. **Brak testów** w Symfony (Phoenix API ma 6 testów).
+10. **Hardcoded admin w security.yaml** — in-memory user z hasłem "admin" i ROLE_ADMIN, przy wyłączonym firewallu. Martwy kod z potencjalnym ryzykiem gdyby ktoś włączył security. Usunięty.
+11. **SeedDatabaseCommand nie był idempotentny** — ponowne uruchomienie `app:seed` crashowało na UNIQUE constraint. Dodana weryfikacja istniejących danych.
+12. **Martwa konfiguracja w services_test.yaml** — synthetic PhoenixClient którego żaden test nie ustawiał. Uproszczone.
 
 ## Co pozytywnego
 
@@ -55,6 +58,15 @@ Strategia to tu lekki overkill — przy kilku prostych filtrach tekstowych wysta
 - **Makefile** — `make test`, `make seed`, `make reset-db`, `make import` zamiast długich komend `docker compose exec ...`. Ułatwia onboarding nowych devów i standaryzuje workflow
 - **REST API** — JSON API do galerii obok widoków HTML (osobny prefix `/api/`). Serializer, pagination w response headers, content negotiation. Przygotowanie pod frontend SPA lub mobilkę
 - **PHPStan + CS Fixer** — statyczna analiza na wysokim poziomie (level 8+) i wymuszony code style. W CI jako gate — PR nie przejdzie bez zielonego PHPStan i spójnego formatowania
+- **CSRF na formularzach POST** — framework ma `csrf_protection: true`, ale formularze token-save i import nie generują ani nie walidują tokena CSRF. Trzeba dodać `csrf_token()` w Twig i `isCsrfTokenValid()` w kontrolerach
+- **Szyfrowanie Phoenix API tokena** — token przechowywany jako plaintext w bazie i wyświetlany w szablonie. Powinien być szyfrowany at rest (np. `sodium_crypto_secretbox`) i maskowany w UI
+- **Więcej testów** — obecne testy pokrywają filtrowanie i import, ale brakuje testów na:
+  - Login/logout flow (czy auth działa po fixie SQL injection i walidacji token-user)
+  - Like/unlike (czy transakcja działa poprawnie, czy UNIQUE constraint blokuje duplikaty)
+  - CommandBus/QueryBus (czy reflection poprawnie mapuje handlery, czy rzuca wyjątek na brak handlera)
+  - PhoenixClient (czy poprawnie obsługuje 401, timeout, malformed response)
+  - DateRangeFilter, UsernameFilter (unit testy analogiczne do TextFilterTest)
+  - SavePhoenixToken (czy token zapisuje się do bazy)
 
 ## Napotkane problemy
 

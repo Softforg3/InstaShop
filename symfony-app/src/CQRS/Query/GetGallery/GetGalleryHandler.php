@@ -18,6 +18,11 @@ final class GetGalleryHandler implements QueryHandlerInterface
         private readonly EntityManagerInterface $em,
     ) {}
 
+    public static function getHandledQuery(): string
+    {
+        return GetGalleryQuery::class;
+    }
+
     /**
      * @return array{photos: array, currentUser: ?User, userLikes: array<int, bool>}
      */

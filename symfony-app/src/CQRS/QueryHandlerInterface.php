@@ -6,4 +6,5 @@ namespace App\CQRS;
 
 interface QueryHandlerInterface
 {
+    public static function getHandledQuery(): string;
 }

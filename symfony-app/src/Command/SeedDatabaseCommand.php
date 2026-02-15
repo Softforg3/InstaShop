@@ -32,6 +32,16 @@ class SeedDatabaseCommand extends Command
 
         $io->title('Seeding database with sample data');
 
+        $existingUser = $this->entityManager->getRepository(User::class)->findOneBy([
+            'username' => 'nature_lover',
+        ]);
+
+        if ($existingUser) {
+            $io->warning('Seed data already exists. Skipping.');
+
+            return Command::SUCCESS;
+        }
+
         // Sample users data
         $usersData = [
             [
