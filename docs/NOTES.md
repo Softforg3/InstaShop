@@ -45,8 +45,8 @@ Filtry budują `FilterCriteriaCollection` (pole + operator + wartość) bez wied
 
 Strategia to tu lekki overkill — przy kilku prostych filtrach tekstowych wystarczyłoby parę `if`-ów w repozytorium. Ale chciałem pokazać pattern, który zaczyna się opłacać przy bardziej złożonych filtrach (full-text, geo, zakresy cenowe). Dodanie nowego filtra = nowa klasa, zero zmian w istniejącym kodzie.
 
-## Plan dalszych prac
+## Co bym zrobił gdybym miał więcej czasu
 
-### Testy
-
-- Unit, integracyjne, funkcjonalne — po jednym z każdego rodzaju jak wymaga zadanie
+- **Paginacja z lazy loading** — galeria powinna ładować zdjęcia stronami zamiast wszystkich naraz. Cursor-based pagination (po id/dacie) zamiast offset, bo nie gubi pozycji przy dodawaniu nowych zdjęć. Infinite scroll na froncie z Intersection Observer — użytkownik scrolluje, kolejna strona doładowuje się automatycznie
+- **Redis cache na pierwszą stronę** — najczęściej odwiedzana strona galerii to pierwsza. Trzymanie wyniku w Redis z dłuższym TTL (np. 10-15 min) odciąża bazę. Invalidacja event-driven — po imporcie zdjęć, dodaniu like'a itp. kasujemy klucz cache i od razu robimy cache warmup (odbudowujemy cache nowym zapytaniem), żeby następny użytkownik trafił w gotowy wynik zamiast czekać na cold miss
+- **Elasticsearch do full-text search** — obecne filtrowanie LIKE po PostgreSQL działa, ale nie obsługuje stemming, fuzzy matching ani relevance scoring. ES pozwoliłby szukać po dowolnej frazie z uwzględnieniem synonimów, literówek i języka naturalnego. Obecna architektura z CriteriaCollection ułatwia migrację — wystarczy nowy adapter mapujący kryteria na zapytania ES zamiast QueryBuildera

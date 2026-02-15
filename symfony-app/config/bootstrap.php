@@ -1,5 +1,9 @@
 <?php
 
+use Symfony\Component\Dotenv\Dotenv;
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-// All environment variables are provided via Docker/system environment
+if (file_exists(dirname(__DIR__) . '/.env')) {
+    (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
+}
